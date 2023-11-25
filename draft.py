@@ -1,6 +1,3 @@
-"""
-Add a docstring
-"""
 
 def game():
 # make_character()
