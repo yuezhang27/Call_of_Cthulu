@@ -17,5 +17,3 @@ A01374508
 yuezhang27
 
 ## Any important comments you'd like to make about your work:
-
-REPLACE THIS LINE WITH ANY COMMENTS
