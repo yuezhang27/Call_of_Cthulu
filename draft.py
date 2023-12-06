@@ -4,14 +4,16 @@ A01374508
 """
 import random
 
+
 def die_of_rooms(level):
-    room = random.randint(1,8)
+    room = random.randint(1, 8)
     if room <= level:
         return "gate"
     elif room > 8 - level:
         return "runes"
     else:
         return "empty room"
+
 
 def make_board(level):
     board_template = {(row, column): die_of_rooms(level) for row in range(5) for column in range(5)}
@@ -30,7 +32,7 @@ def make_character():
     """
 
     character_template = {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 10, "Sanity": 10, "Experience": 0,
-                          "Level": 1}
+                          "Darkness": 4, "Level": 1}
     return character_template
 
 
@@ -50,19 +52,27 @@ def describe_current_location(board, character):
     return board[location]
 
 
-def open_door(character):
+def activate_totem(character):
+    red_at = "\033[91m" + "at" + "\033[0m"
+    validation_activate = input(f"input {red_at} to activate the Totem: \n")
+    while validation_activate != "at":
+        validation_activate = input(f"input {red_at} to activate the Totem: \n")
     character["Current HP"] -= 1
-    open_door_result = random.randint(1, 4)
-    if open_door_result > 1:
-        print("Door opened")
+    activate_totem_result = random.randint(1, character['Darkness'])
+    if activate_totem_result > 1:
+        print("Totem activated")
         character["Experience"] += 1
     else:
-        print("Door is still closed. Try harder or try another direction")
+        print("Totem not activated. Try harder or try another direction")
     return character
 
 
 def read_runes(character):
-    read_runes_result = random.randint(1, 4)
+    red_rr = "\033[91m" + "rr" + "\033[0m"
+    validation_read = input(f"input {red_rr} to read runes: \n")
+    while validation_read != "rr":
+        validation_read = input(f"input {red_rr} to read runes: \n")
+    read_runes_result = random.randint(1, character['Darkness'])
     if read_runes_result > 1:
         print("Runes read. You hear the whispers of the stars, speaking of eternal darkness and the endless void.")
         character["Sanity"] -= 1
@@ -71,8 +81,9 @@ def read_runes(character):
         print("You can't read the runes. 'Weird place.' You thought.")
     return character
 
+
 def check_level_up(character):
-    if character["Experience"] >= 10:
+    if character['Level'] < 3 and character["Experience"] >= 10:
         return True
     else:
         return False
@@ -85,7 +96,7 @@ def get_user_choice():
     :postcondition: Display and store the user's choice for character's moving direction
     :return: an integer from 1 to 4 (include both) representing the direction
     """
-    direction_system = {1: "Up", 2: "Down", 3: "Left", 4: "Right"}
+    direction_system = {1: "North", 2: "South", 3: "West", 4: "East"}
     print("_"*10)
     print(direction_system)
     choice = input("Please choose your direction, please only input numbers from 1 to 4:\n")
@@ -103,7 +114,6 @@ def validate_move(character, direction):
     """
     Check if the character can move along the direction on the board.
 
-    :param board: a dictionary with key-value pairs representing coordinate-description
     :param character: a dictionary representing a character with x-coordinate, y-coordinate and HP
     :param direction: an integer representing the direction that the character wants to move forward
     :precondition: board's keys must be coordinates in the form of (x , y)
@@ -138,14 +148,31 @@ def move_character(character, direction):
 def mad_or_prophet(level):
     meet_mad_or_prophet = random.randint(1, 8)
     if meet_mad_or_prophet <= level:
-        print("When you turn the corner, you come face-to-face with wild, haunted eyes. A figure, shrouded in tattered clothes, shambles towards you, muttering incoherently. Their gaze is frenzied, and an unsettling chill runs down your spine. It's clear that this poor soul has succumbed to madness, their mind fractured by horrors unknown. With a sudden, startling energy, they lunge at you, driven by an unfathomable madness.")
+        mad_text = ("When you turn the corner, you come face-to-face with wild, haunted eyes. "
+                    "A figure, shrouded in tattered clothes, shambles towards you, muttering incoherently. "
+                    "Their gaze is frenzied, and an unsettling chill runs down your spine. "
+                    "It's clear that this poor soul has succumbed to madness, their mind fractured by horrors unknown. "
+                    "With a sudden, startling energy, they lunge at you, driven by an unfathomable madness.")
+        print(mad_text)
         return "Madness"
     elif meet_mad_or_prophet > 8 - level:
-        print("As you navigate the misty streets, you encounter a solitary figure. Cloaked in a robe adorned with arcane symbols, they stand eerily still. Their eyes, filled with an otherworldly knowledge, fix upon you. 'Seeker of truths,' they intone in a voice that seems to echo from a forgotten age, 'heed my words and be enlightened.' The air around them vibrates with a strange energy, and you sense that this prophet may unlock secrets that will guide your journey.")
+        prophet_text = ("As you navigate the misty streets, you encounter a solitary figure. "
+                        "Cloaked in a robe adorned with arcane symbols, they stand eerily still. "
+                        "Their eyes, filled with an otherworldly knowledge, fix upon you. "
+                        "'Seeker of truths,' they intone in a voice that seems to echo from a forgotten age, "
+                        "'heed my words and be enlightened.' "
+                        "The air around them vibrates with a strange energy, "
+                        "and you sense that this prophet may unlock secrets that will guide your journey.")
+        print(prophet_text)
         return "Prophet"
     else:
-        print("The streets are eerily empty. Fog swirls around, casting shifting shadows, yet reveals no other soul. An unsettling quiet pervades, as if the town itself holds its breath, concealing secrets best left undiscovered.")
+        nobody_text = ("The streets are eerily empty. "
+                       "Fog swirls around, casting shifting shadows, yet reveals no other soul. "
+                       "An unsettling quiet pervades, as if the town itself holds its breath, "
+                       "concealing secrets best left undiscovered.")
+        print(nobody_text)
         return "Nobody"
+
 
 def check_if_goal_attained(character):
     """
@@ -160,9 +187,15 @@ def check_if_goal_attained(character):
     goal_location = (4, 4)
     return current_location == goal_location
 
+
 def check_win(character):
-    chance = random.randint(1, 2)
-    if chance == 1:
+    red_fm = "\033[91m" + "fm" + "\033[0m"
+    validation_fight = input(f"input {red_fm} to fight with the Madness: \n")
+    while validation_fight != "fm":
+        validation_fight = input(f"input {red_fm} to fight with the Madness: \n")
+    chance_win = character['Darkness']
+    chance = random.randint(1, chance_win)
+    if chance >= 3:
         print("You won")
         character["Experience"] += 2
     else:
@@ -171,29 +204,39 @@ def check_win(character):
     character["Sanity"] -= 1
     return
 
+
 def check_learn(character, level):
+    red_lp = "\033[91m" + "lp" + "\033[0m"
+    validation_learn = input(f"input {red_lp} to learn from the Prophet: \n")
+    while validation_learn != "lp":
+        validation_learn = input(f"input {red_lp} to learn from the Prophet: \n")
     border = 2*level
     chance = random.randint(1, border)
     if chance == 1:
-        print("The prophet, though tainted by otherworldly forces, imparts cryptic wisdom that resonates within you, enhancing your understanding and strengthening your resolve.")
+        text_learn_runes = ("The prophet, though tainted by otherworldly forces, "
+                            "imparts cryptic wisdom that resonates within you, "
+                            "enhancing your understanding and strengthening your resolve.")
+        print(text_learn_runes)
         print("runes learnt")
         character["Experience"] += 2
         character["Sanity"] += 1
     else:
         print("runes not learnt")
-        print("As you approach, the prophet's form distorts unnaturally, their words dissolving into an incomprehensible babble, leaving you bewildered and no wiser than before.")
+        text_not_learnt = ("As you approach, the prophet's form distorts unnaturally, "
+                           "their words dissolving into an incomprehensible babble, "
+                           "leaving you bewildered and no wiser than before.")
+        print(text_not_learnt)
     return
 
 
 def decide_text():
-    text_generator = random.randint(1, 7)
+    text_generator = random.randint(1, 6)
     text_base = {1: "I hear the whispers of the stars, speaking of eternal darkness and the endless void.",
                  2: "Time is melting before my eyes, reality and dreams entwined, indistinguishable.",
-                 3: "It's calling me, the ancient one from the abyss, I cannot resist its voice.",
                  4: "All is in vain, we are but insignificant specks in this cosmos.",
                  5: "I am unsure what is real anymore, or if my mind has been corrupted by the darkness.",
                  6: "Other worlds are calling me, I hear the summons from unknown realms.",
-                 7: "Akhamna, Igwatius... these runes echo in my mind, I cannot stop them"}
+                 3: "Akhamna, Igwatius... these runes echo in my mind, I cannot stop them"}
     print(text_base[text_generator])
     return
 
@@ -219,6 +262,49 @@ def is_alive_and_sane(character):
         return True
 
 
+def boss_fight(character):
+    """
+    Simulates a boss fight.
+
+    :param character: a dictionary representing the player's character
+    :return: True if the player wins the fight, False if lose the fight
+    """
+    print("The sea roars, and from its depths emerges the 'Lord of the Abyss', a creature of unspeakable horror.")
+    print("Your HP, Sanity and Darkness ability have restored")
+    character["Current HP"] = 13
+    character["Sanity"] = 13
+    character["Darkness"] = 7
+    commands_descriptions = {
+        "ac": "Ancient Chant - Breaks the defenses.",
+        "eb": "Eldritch Blast - Unleashes powerful energy against the Eye.",
+        "ms": "Mystic Shield - Temporarily boosts defense.",
+        "ag": "Abyssal Gaze - Stares into the abyss, seizing an attack opportunity."
+    }
+    commands = ["ac", "eb", "ms", "ag"]
+    for command in commands:
+        print(f"{command} : {commands_descriptions[command]}")
+    success_count = 0
+    for count in range(3):  # Let's say there are 3 rounds in the boss fight
+        command = input(f"Enter command {commands} to challenge the abyss: ")
+        while command not in commands:
+            command = input(f"Invalid command! Enter command {commands} to challenge the abyss: ")
+        success_chance = character['Level'] + character['Darkness'] + character['Experience']
+        if random.randint(1, 25) <= success_chance:
+            print("Your courage shines, striking a blow against the abyssal horror!")
+            success_count += 1
+        else:
+            print("Your attack falters. The 'Lord of the Abyss' retaliates with a wave of dark energy!")
+            character["Current HP"] -= 2
+            character["Sanity"] -= 1
+        if character["Current HP"] <= 0:
+            print("Engulfed by darkness, your journey ends in the jaws of the abyss.")
+            return False
+        if character["Sanity"] <= 0:
+            print("Overwhelmed by the abyss, your mind succumbs to madness.")
+            return False
+    return success_count >= 2
+
+
 def game():
     """
     Run the game.
@@ -226,18 +312,21 @@ def game():
     character = make_character()
     while True:
         print("=" * 20)
-        print(f"Day {character['Level']}")
+        level = character['Level']
+        print(f"Day {level}")
+        title_text = {1: "the Past Shadow", 2: "Mouth of Madness", 3: "Call of Cthulu"}
+        print(f"{title_text[level]}")
         if_level_up = [False]
         board = make_board(character['Level'])
         while if_level_up[0] is False:
             achieved_goal = False
             while is_alive_and_sane(character) and not achieved_goal:
-                current_room = describe_current_location(board, character) # Tell the user where they are
+                current_room = describe_current_location(board, character)
                 if current_room == "empty room":
                     direction = get_user_choice()
                 else:
                     if current_room == "gate":
-                        open_door(character)
+                        activate_totem(character)
                     else:
                         read_runes(character)
                     direction = get_user_choice()
@@ -258,7 +347,10 @@ def game():
                 decide_text()
             if achieved_goal:
                 if character['Level'] == 3:
-                    print("You survived.")
+                    if boss_fight(character):
+                        print("With a final, valiant effort, you vanquish the 'Lord of the Abyss'. You survived.")
+                    else:
+                        print("Overwhelmed by the ancient terror, your fate is sealed.")
                     print("Game Over")
                     print("=" * 20)
                     return
@@ -272,6 +364,9 @@ def game():
             current_level = character['Level'] + 1
             character = make_character()
             character['Level'] = current_level
+            character['Current HP'] += current_level
+            character['Sanity'] += current_level
+            character['Darkness'] += current_level
 
 
 def main():
