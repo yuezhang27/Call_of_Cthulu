@@ -2,13 +2,15 @@
 Kim Zhang
 A01374508
 """
+import json
 import random
+from pathlib import Path
 
 
 def die_of_rooms(level):
     room = random.randint(1, 8)
     if room <= level:
-        return "gate"
+        return "Totem"
     elif room > 8 - level:
         return "runes"
     else:
@@ -48,37 +50,42 @@ def describe_current_location(board, character):
     coordinate_x = character["X-coordinate"]
     coordinate_y = character["Y-coordinate"]
     location = (coordinate_x, coordinate_y)
-    print("Your current location is:", location, "it is:", board[location])
+    red_location = "\033[91m{}\033[0m".format(location)
+    print(f"Your current location is: {red_location} it is: {board[location]}")
     return board[location]
 
 
 def activate_totem(character):
     red_at = "\033[91m" + "at" + "\033[0m"
+    text_activate = "Totem activated"
+    text_not_activate = "Totem not activated. Try harder or try another direction"
     validation_activate = input(f"input {red_at} to activate the Totem: \n")
     while validation_activate != "at":
         validation_activate = input(f"input {red_at} to activate the Totem: \n")
     character["Current HP"] -= 1
     activate_totem_result = random.randint(1, character['Darkness'])
     if activate_totem_result > 1:
-        print("Totem activated")
+        print(f"{text_activate}")
         character["Experience"] += 1
     else:
-        print("Totem not activated. Try harder or try another direction")
+        print(f"{text_not_activate}")
     return character
 
 
 def read_runes(character):
     red_rr = "\033[91m" + "rr" + "\033[0m"
+    text_read = "Runes read. You hear the whispers of the stars, speaking of eternal darkness and the endless void."
+    text_not_read = "You can't read the runes. 'Weird place.' You thought."
     validation_read = input(f"input {red_rr} to read runes: \n")
     while validation_read != "rr":
         validation_read = input(f"input {red_rr} to read runes: \n")
     read_runes_result = random.randint(1, character['Darkness'])
     if read_runes_result > 1:
-        print("Runes read. You hear the whispers of the stars, speaking of eternal darkness and the endless void.")
+        print("{}".format(text_read))
         character["Sanity"] -= 1
         character["Experience"] += 2
     else:
-        print("You can't read the runes. 'Weird place.' You thought.")
+        print("{}".format(text_not_read))
     return character
 
 
@@ -90,24 +97,22 @@ def check_level_up(character):
 
 
 def get_user_choice():
-    """
-    Obtain the user's choice for direction.
-
-    :postcondition: Display and store the user's choice for character's moving direction
-    :return: an integer from 1 to 4 (include both) representing the direction
-    """
     direction_system = {1: "North", 2: "South", 3: "West", 4: "East"}
-    print("_"*10)
-    print(direction_system)
-    choice = input("Please choose your direction, please only input numbers from 1 to 4:\n")
-    while not choice.isnumeric():
-        choice = input("Try again, please only input numbers from 1 to 4:\n")
-    while choice not in ["1", "2", "3", "4"]:
-        choice = input("Try again, please only input numbers from 1 to 4:\n")
-    choice = int(choice)
-    print("You choose to move:", direction_system[choice])
+    red_system = "\033[91m{}\033[0m".format(direction_system)
     print("_" * 10)
-    return choice
+    print(red_system)
+    while True:
+        try:
+            choice = int(input("Please choose your direction, please only input numbers from 1 to 4:\n"))
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+        else:
+            if choice in [1, 2, 3, 4]:
+                print("You choose to move: {}".format(direction_system[choice]))
+                print("_" * 10)
+                return choice
+            else:
+                print("Input must be a number from 1 to 4. Try again.")
 
 
 def validate_move(character, direction):
@@ -305,14 +310,51 @@ def boss_fight(character):
     return success_count >= 2
 
 
-def game():
+def load_data(filename='game.json'):
+    path = Path(filename)
+    if path.is_file():
+        with path.open('r') as file_object:
+            return json.load(file_object)
+    else:
+        return {}
+
+
+def save_data(data, filename='game.json'):
+    with open(filename, 'w') as file_object:
+        json.dump(data, file_object)
+
+
+def get_user_data(data, username):
+    return data.get(username, None)
+
+
+def create_new_user(data, username):
+    data[username] = {'character': make_character(), 'level': 1}
+    save_data(data)
+
+
+def game(username, game_data):
     """
     Run the game.
     """
-    character = make_character()
+    user_data = get_user_data(game_data, username)
+    if user_data:
+        choice = input("Input 'ng' to start new game, or 'ct' to continue from last save: ")
+        if choice == 'ng':
+            character = make_character()
+            user_data = {'character': character, 'level': 1}
+    else:
+        print("New user detected. Creating a new account...")
+        character = make_character()
+        user_data = {'character': character, 'level': 1}
+        game_data[username] = user_data
+        save_data(game_data)
+    character = user_data['character']
+    # level = user_data['level']
     while True:
         print("=" * 20)
-        level = character['Level']
+        # level = character['Level']
+        level = user_data['level']
         print(f"Day {level}")
         title_text = {1: "the Past Shadow", 2: "Mouth of Madness", 3: "Call of Cthulu"}
         print(f"{title_text[level]}")
@@ -325,7 +367,7 @@ def game():
                 if current_room == "empty room":
                     direction = get_user_choice()
                 else:
-                    if current_room == "gate":
+                    if current_room == "Totem":
                         activate_totem(character)
                     else:
                         read_runes(character)
@@ -337,6 +379,10 @@ def game():
                     direction = get_user_choice()
                     valid_move = validate_move(character, direction)
                 move_character(character, direction)
+                current_coordinate = (character["X-coordinate"], character["Y-coordinate"])
+                if current_coordinate != (4, 4):
+                    game_data[username] = {'character': character, 'level': character['Level']}
+                    save_data(game_data)
                 stranger = mad_or_prophet(character['Level'])
                 if stranger == "Madness":
                     check_win(character)
@@ -362,18 +408,24 @@ def game():
                 return
         if if_level_up[0] is True:
             current_level = character['Level'] + 1
+            user_data['level'] = current_level
             character = make_character()
             character['Level'] = current_level
             character['Current HP'] += current_level
             character['Sanity'] += current_level
             character['Darkness'] += current_level
+            game_data[username] = {'character': character, 'level': character['Level']}
+            save_data(game_data)
 
 
 def main():
     """
     Drives the program.
     """
-    game()
+    # game()
+    game_data = load_data()
+    username = input("Please enter your username: ")
+    game(username, game_data)
 
 
 if __name__ == "__main__":
