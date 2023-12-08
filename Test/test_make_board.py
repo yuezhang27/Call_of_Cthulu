@@ -5,7 +5,7 @@ make_board
 from unittest import TestCase
 from unittest.mock import patch
 
-from draft import make_board
+from Main.draft import make_board
 
 
 class TestMakeBoard(TestCase):

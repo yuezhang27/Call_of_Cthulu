@@ -4,7 +4,7 @@ make_character
 """
 from unittest import TestCase
 
-from draft import make_character
+from Main.draft import make_character
 
 
 class TestMakeCharacter(TestCase):

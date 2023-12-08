@@ -6,7 +6,7 @@ from io import StringIO
 from unittest import TestCase
 from unittest.mock import patch
 
-from draft import describe_current_location
+from Main.draft import describe_current_location
 
 
 class TestDescribeCurrentLocation(TestCase):
