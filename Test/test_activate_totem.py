@@ -6,7 +6,7 @@ from io import StringIO
 from unittest import TestCase
 from unittest.mock import patch
 
-from Main.draft import activate_totem
+from Main.CallOfCthulu import activate_totem
 
 
 class TestActivateTotem(TestCase):

@@ -590,7 +590,6 @@ def main():
     """
     Drives the program.
     """
-    # game()
     game_data = load_data()
     username = input("Please enter your username: ")
     game(username, game_data)

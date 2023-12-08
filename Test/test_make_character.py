@@ -4,7 +4,7 @@ make_character
 """
 from unittest import TestCase
 
-from Main.draft import make_character
+from Main.CallOfCthulu import make_character
 
 
 class TestMakeCharacter(TestCase):

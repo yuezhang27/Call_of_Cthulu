@@ -4,7 +4,7 @@ check_level_up
 """
 from unittest import TestCase
 
-from Main.draft import check_level_up
+from Main.CallOfCthulu import check_level_up
 
 
 class TestCheckLevelUp(TestCase):

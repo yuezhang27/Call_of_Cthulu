@@ -6,7 +6,7 @@ from io import StringIO
 from unittest import TestCase
 from unittest.mock import patch
 
-from Main.draft import get_user_choice
+from Main.CallOfCthulu import get_user_choice
 
 
 class TestGetUserChoice(TestCase):

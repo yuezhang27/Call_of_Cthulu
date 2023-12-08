@@ -4,7 +4,7 @@ move_character
 """
 from unittest import TestCase
 
-from Main.draft import move_character
+from Main.CallOfCthulu import move_character
 
 
 class TestMoveCharacter(TestCase):

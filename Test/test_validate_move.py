@@ -4,7 +4,7 @@ validate_move
 """
 from unittest import TestCase
 
-from Main.draft import validate_move
+from Main.CallOfCthulu import validate_move
 
 
 class TestValidateMove(TestCase):
