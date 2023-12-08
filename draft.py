@@ -8,6 +8,17 @@ from pathlib import Path
 
 
 def die_of_rooms(level):
+    """
+    Generates a random room based on the level.
+
+    This function generate a random room type. The type of room generated depends on the level of the character. The
+    higher the level is, the higher the chance of encountering 'Totem' or 'runes' will be.
+
+    :param level: a positive integer representing for the level of the character.
+    :precondition: level must be a positive integer between 1 and 3, inclusive.
+    :postcondition: generate a room type between "Totem", "runes" and "empty room" based on the level.
+    :return: A string representing the type of room generated.
+    """
     room = random.randint(1, 8)
     if room <= level:
         return "Totem"
@@ -18,6 +29,17 @@ def die_of_rooms(level):
 
 
 def make_board(level):
+    """
+    Generates a 5x5 game board with various room types based on the level.
+
+    This function creates a dictionary representing a game board, where each key is a coordinate tuple (row, column),
+    and value is a string of room type. The starting room (0,0) is always 'empty room'.
+
+    :param level: a positive integer representing the level of the character.
+    :precondition: level must be a positive integer between 1 and 3, inclusive.
+    :postcondition: generate a dictionary where each key is a coordinate and each value is a room type.
+    :return: A dictionary representing a 5x5 game board.
+    """
     board_template = {(row, column): die_of_rooms(level) for row in range(5) for column in range(5)}
     board_template[(0, 0)] = "empty room"
     return board_template
@@ -28,11 +50,13 @@ def make_character():
     Make a character that has coordinate and HP.
 
     :precondition: must not pass any parameter
-    :postcondition: make a dictionary representing a character with x and y coordinates and current HP
-    :return: a dictionary with 6 key-value pairs
-    {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 10, "Sanity": 10, "Experience": 0, "Level": 1}
-    """
+    :postcondition: make a dictionary representing a character with x and y coordinates, current HP, Sanity,
+    Experience, Darkness and Level
+    :return: a dictionary with 7 key-value pairs, representing the initialized character
 
+    >>> make_character()
+    {'X-coordinate': 0, 'Y-coordinate': 0, 'Current HP': 10, 'Sanity': 10, 'Experience': 0, 'Darkness': 4, 'Level': 1}
+    """
     character_template = {"X-coordinate": 0, "Y-coordinate": 0, "Current HP": 10, "Sanity": 10, "Experience": 0,
                           "Darkness": 4, "Level": 1}
     return character_template
@@ -42,10 +66,11 @@ def describe_current_location(board, character):
     """
     Shows character's current location and its description.
 
-    :param board: a dictionary representing board of locations, keys are in (x,y) form, values are descriptions
-    :param character: a dictionary representing a character, items are x coordinate; y coordinate; and current HP
+    :param board: a dictionary which each key is a coordinate and each value is a room type
+    :param character: a dictionary representing a character
     :precondition: must pass two dictionaries
     :postcondition: shows the current coordinate location of character and the location's description
+    :return: a string representing the description of the current location's room type
     """
     coordinate_x = character["X-coordinate"]
     coordinate_y = character["Y-coordinate"]
@@ -56,6 +81,18 @@ def describe_current_location(board, character):
 
 
 def activate_totem(character):
+    """
+    Attempts to activate a totem with player's input.
+
+    This function ask the player for input command 'at' to activate a totem. If the command is correct, the function
+    then randomly determines if the totem is activated successfully based on the character's 'Darkness' attribute.
+    Then the character's status is updated based on the result.
+
+    :param character: A dictionary representing a character, containing 'Current HP', 'Darkness', and other attributes.
+    :precondition: character must be a dictionary with 'Current HP' and 'Darkness' as keys.
+    :postcondition: Updates the character's HP and experience based on if the totem activation is success.
+    :return: An updated dictionary representing for the character after encountering the Totem.
+    """
     red_at = "\033[91m" + "at" + "\033[0m"
     text_activate = "Totem activated"
     text_not_activate = "Totem not activated. Try harder or try another direction"
@@ -73,6 +110,18 @@ def activate_totem(character):
 
 
 def read_runes(character):
+    """
+    Attempts to read runes with player's input.
+
+    This function allows a player to try reading runes. It asks the player to enter a command 'rr'. If the command is
+    correct, the function then uses a random chance which related to the character's Darkness to decide if the player
+    successfully reads the runes. If successful, the character loses sanity but gains experience.
+
+    :param character: A dictionary representing the character, with 'Sanity', 'Darkness', and other attributes.
+    :precondition: character should be a dictionary with 'Sanity' and 'Darkness' as keys.
+    :postcondition: Changes the character's sanity and experience based on whether the runes are read successfully.
+    :return: An updated dictionary representing for the character after encountering the rune.
+    """
     red_rr = "\033[91m" + "rr" + "\033[0m"
     text_read = "Runes read. You hear the whispers of the stars, speaking of eternal darkness and the endless void."
     text_not_read = "You can't read the runes. 'Weird place.' You thought."
@@ -90,6 +139,21 @@ def read_runes(character):
 
 
 def check_level_up(character):
+    """
+    Checks if the character can level up.
+
+    This function looks at the character's level and experience. If the level is less than 3 and experience is 10
+    or more, the character can level up. The function returns True or False based on whether level up.
+
+    :param character: A dictionary representing the character, with 'Level', 'Experience', and other attributes.
+    :precondition: character should be a dictionary with 'Level' and 'Experience' as keys.
+    :return: True if the character can level up, False if not.
+
+    >>> check_level_up({"Level": 2, "Experience": 10})
+    True
+    >>> check_level_up({"Level": 1, "Experience": 9})
+    False
+    """
     if character['Level'] < 3 and character["Experience"] >= 10:
         return True
     else:
@@ -97,6 +161,18 @@ def check_level_up(character):
 
 
 def get_user_choice():
+    """
+    Asks the player to pick a direction.
+
+    This function shows four directions: North, South, West, and East. The player picks a direction by typing a number
+    (1 to 4, inclusive). If the player types something else, the function asks again. It keeps asking until the player
+    picks correctly.
+
+    :precondition: should pass 0 arguments to the function.
+    :postcondition: verify if player's choice is valid (a positive integer in 1 to 4, inclusive), and get the valid
+    choice of direction
+    :return: the integer the player picks that matches a direction.
+    """
     direction_system = {1: "North", 2: "South", 3: "West", 4: "East"}
     red_system = "\033[91m{}\033[0m".format(direction_system)
     print("_" * 10)
@@ -119,13 +195,21 @@ def validate_move(character, direction):
     """
     Check if the character can move along the direction on the board.
 
-    :param character: a dictionary representing a character with x-coordinate, y-coordinate and HP
-    :param direction: an integer representing the direction that the character wants to move forward
-    :precondition: board's keys must be coordinates in the form of (x , y)
-    :precondition: character keys must be: "X-coordinate", "Y-coordinate", "Current HP"
-    :precondition: direction must be in [1,2,3,4]
-    :postcondition: must check if it is True or False that the character can move along the chosen direction
-    :return: True if the character can move towards specified direction, False if it can't
+    This function checks whether a character can move in a given direction based on their current coordinates.
+    Directions are represented by integers: 1 for North, 2 for South, 3 for West, and 4 for East.
+
+    :param character: A dictionary representing a character with 'X-coordinate', 'Y-coordinate', and other attributes.
+    :param direction: An integer (1, 2, 3, 4) representing the direction of the incoming movement.
+    :precondition: character must have 'X-coordinate' and 'Y-coordinate' keys with integer values from 0 to 4,
+    inclusive.
+    :precondition: direction must be an integer in [1, 2, 3, 4].
+    :postcondition: Evaluates if the movement in the specified direction is possible within a 5x5 grid.
+    :return: True if the character can move in the specified direction, False otherwise.
+
+    >>> validate_move({"X-coordinate": 2, "Y-coordinate": 2, "Current HP": 10, "Sanity": 10, "Experience": 0,"Darkness": 4, "Level": 1}, 1)
+    True
+    >>> validate_move({"X-coordinate": 0, "Y-coordinate": 2, "Current HP": 10, "Sanity": 10, "Experience": 0,"Darkness": 4, "Level": 1}, 1)
+    False
     """
     current_row = character["X-coordinate"]
     current_column = character["Y-coordinate"]
@@ -140,6 +224,23 @@ def validate_move(character, direction):
 
 
 def move_character(character, direction):
+    """
+    Moves the character to a direction.
+
+    This function changes the character's position. Directions are numbers: 1 for North, 2 for South, 3 for West,
+    4 for East. The function updates the character's 'X-coordinate' or 'Y-coordinate' based on the direction.
+
+    :param character: A dictionary with the character's 'X-coordinate' and 'Y-coordinate' and other details.
+    :param direction: An integer (1, 2, 3, 4) that shows which direction to move.
+    :precondition: character must be a dictionary with 'X-coordinate' and 'Y-coordinate' and other keys.
+    :precondition: direction must be a number from 1 to 4, inclusive.
+    :postcondition: Updates the character's position based on the direction.
+
+    >>> my_character = {"X-coordinate": 2, "Y-coordinate": 2, "Current HP": 10, "Sanity": 10, "Experience": 0,"Darkness": 4, "Level": 1}
+    >>> move_character(my_character, 1)
+    >>> my_character
+    {'X-coordinate': 1, 'Y-coordinate': 2, 'Current HP': 10, 'Sanity': 10, 'Experience': 0, 'Darkness': 4, 'Level': 1}
+    """
     if direction == 1:
         character["X-coordinate"] -= 1
     elif direction == 2:
@@ -151,6 +252,18 @@ def move_character(character, direction):
 
 
 def mad_or_prophet(level):
+    """
+    Decides if player meet a Madness, a Prophet or Nobody.
+
+    This function randomly decides who player meets based on character's level. If level is high, the character is more
+    likely to meet a prophet. If not, the character might meet a mad person or nobody. Then It tells player some
+    background text about whom the character meets.
+
+    :param level: An integer from 1 to 3 (inclusive) representing character's level.
+    :precondition: level must be a positive integer from 1 to 3, inclusive.
+    :postcondition: prints a text description about the person you meet.
+    :return: A string 'Madness', 'Prophet', or 'Nobody' representing who the player meets.
+    """
     meet_mad_or_prophet = random.randint(1, 8)
     if meet_mad_or_prophet <= level:
         mad_text = ("When you turn the corner, you come face-to-face with wild, haunted eyes. "
@@ -183,10 +296,10 @@ def check_if_goal_attained(character):
     """
     Check if character has reached the bottom right hand corner.
 
-    :param character: a dictionary representing a character with x-coordinate, y-coordinate and HP
-    :precondition: character keys must be: "X-coordinate", "Y-coordinate", "Current HP"
-    :postcondition: check if it is True that the character has reached the bottom right corner after last move
-    :return: True if the character has reached the bottom right corner after the last move, False if it hasn't
+    :param character: a dictionary representing a character with x-coordinate, y-coordinate and other attributes.
+    :precondition: character keys must have: "X-coordinate", "Y-coordinate".
+    :postcondition: check if it is True that the character has reached the bottom right corner (4, 4) after a move
+    :return: True if the character has reached the bottom right corner after a last move, False if it hasn't
     """
     current_location = (character["X-coordinate"], character["Y-coordinate"])
     goal_location = (4, 4)
@@ -194,6 +307,17 @@ def check_if_goal_attained(character):
 
 
 def check_win(character):
+    """
+    Decides if the character wins or loses a fight against Madness.
+
+    This function lets a character fight Madness. The player must enter a command ('fm') to start the fight.
+    Then it uses a random chance, based on the character's 'Darkness' level, to decide if the character wins.
+    If the character wins, they gain experience. Either way, the character loses some health and sanity.
+
+    :precondition: The character must have 'Current HP', 'Sanity', and 'Darkness' as keys in its dictionary.
+    :postcondition: Updates the character's 'Current HP', 'Sanity', and 'Experience' based on the fight's result.
+    :return: None. This function updates the character's attributes but does not return anything.
+    """
     red_fm = "\033[91m" + "fm" + "\033[0m"
     validation_fight = input(f"input {red_fm} to fight with the Madness: \n")
     while validation_fight != "fm":
@@ -211,6 +335,13 @@ def check_win(character):
 
 
 def check_learn(character, level):
+    """
+    Decides if the character learns from the Prophet.
+
+    :precondition: The character must have 'Experience' and 'Sanity' as keys in its dictionary.
+    :precondition: level must be a positive integer.
+    :postcondition: Updates the character's 'Experience' and 'Sanity' based on whether they learn from the Prophet.
+    """
     red_lp = "\033[91m" + "lp" + "\033[0m"
     validation_learn = input(f"input {red_lp} to learn from the Prophet: \n")
     while validation_learn != "lp":
@@ -235,6 +366,9 @@ def check_learn(character, level):
 
 
 def decide_text():
+    """
+    Prints a random text for game background.
+    """
     text_generator = random.randint(1, 6)
     text_base = {1: "I hear the whispers of the stars, speaking of eternal darkness and the endless void.",
                  2: "Time is melting before my eyes, reality and dreams entwined, indistinguishable.",
@@ -248,12 +382,12 @@ def decide_text():
 
 def is_alive_and_sane(character):
     """
-    Check if the character is alive based on character's HP.
+    Check if the character is alive and sane.
 
-    :param character: a dictionary representing a character, have 3 items for x-coordinate, y-coordinate and HP
-    :precondition: character must be a dictionary containing keys: "X-coordinate", "Y-coordinate", "Current HP"
-    :postcondition: check if the character is alive by checking if value of "Current HP" is greater than 0
-    :return: True if the character is alive, False if character dead
+    :param character: A dictionary representing a character with attributes like 'Current HP' and 'Sanity'.
+    :precondition: character must be a dictionary containing "Current HP" and "Sanity" as keys.
+    :postcondition: Checks if the character's 'Current HP' is > 0 and 'Sanity' is > 0.
+    :return: True if the character is both alive and sane, False otherwise.
     """
     if character["Current HP"] <= 0:
         print("You are dead of low HP")
@@ -272,6 +406,8 @@ def boss_fight(character):
     Simulates a boss fight.
 
     :param character: a dictionary representing the player's character
+    :precondition: character must be a dictionary with keys: "Current HP", "Sanity", "Darkness", 'Level', "Experience"
+    :postcondition: tells if player wins the fight
     :return: True if the player wins the fight, False if lose the fight
     """
     print("The sea roars, and from its depths emerges the 'Lord of the Abyss', a creature of unspeakable horror.")
@@ -289,7 +425,7 @@ def boss_fight(character):
     for command in commands:
         print(f"{command} : {commands_descriptions[command]}")
     success_count = 0
-    for count in range(3):  # Let's say there are 3 rounds in the boss fight
+    for count in range(3):
         command = input(f"Enter command {commands} to challenge the abyss: ")
         while command not in commands:
             command = input(f"Invalid command! Enter command {commands} to challenge the abyss: ")
@@ -311,6 +447,13 @@ def boss_fight(character):
 
 
 def load_data(filename='game.json'):
+    """
+    Loads game data from a file.
+
+    :param filename: The name of the file to load data from, default value is 'game.json'.
+    :postcondition: loads data from the file if it exists.
+    :return: A dictionary which is the data from the file, or an empty dictionary if the file does not exist.
+    """
     path = Path(filename)
     if path.is_file():
         with path.open('r') as file_object:
@@ -320,15 +463,42 @@ def load_data(filename='game.json'):
 
 
 def save_data(data, filename='game.json'):
+    """
+    Saves game data to a file.
+
+    :param data: the game data to be saved.
+    :param filename: The name of the file to save data to, default value is 'game.json'.
+    :precondition: data must be a valid dictionary
+    :postcondition: writes the given data to the specified file 'game.json' in JSON.
+    """
     with open(filename, 'w') as file_object:
         json.dump(data, file_object)
 
 
 def get_user_data(data, username):
+    """
+    Gets a user's data with the given username.
+
+    :param data: a dictionary representing for the game data.
+    :param username: a string representing for a username
+    :precondition: data must be a dictionary
+    :precondition: username must be a string
+    :postcondition: get the user data from the game data if the user exists.
+    :return: If can find the user's data, return the user's data, otherwise, return None.
+    """
     return data.get(username, None)
 
 
 def create_new_user(data, username):
+    """
+    Creates a new user and save it in the game data.
+
+    :param data: a dictionary representing for the game data.
+    :param username: a string representing for a username
+    :precondition: data must be a dictionary
+    :precondition: username must be a string
+    :postcondition: a new user added to the game data and saves the updated data.
+    """
     data[username] = {'character': make_character(), 'level': 1}
     save_data(data)
 
@@ -350,10 +520,8 @@ def game(username, game_data):
         game_data[username] = user_data
         save_data(game_data)
     character = user_data['character']
-    # level = user_data['level']
     while True:
         print("=" * 20)
-        # level = character['Level']
         level = user_data['level']
         print(f"Day {level}")
         title_text = {1: "the Past Shadow", 2: "Mouth of Madness", 3: "Call of Cthulu"}
