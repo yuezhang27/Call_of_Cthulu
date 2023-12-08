@@ -1,5 +1,6 @@
 """
-Add a docstring
+Unit Test
+activate_totem
 """
 from io import StringIO
 from unittest import TestCase
