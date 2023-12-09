@@ -27,8 +27,11 @@ navigate through various rooms on a 5x5 game board, each holding its own darknes
 Lovecraftian universe where they encounter totems, runes, and players might encounter Madness they need 
 to fight with and the Prophet they can learn runes from.
 
-### Starting the Game
+### Starting/Saving the Game
 On launching the game, players are prompted to enter a username. 
-They can then choose to start a new game or continue from a saved state. 
+If you are a new player, you can enter a new username and start a new game.
+If you are an existing player, you can enter your username and choose to start a new game or load your saved game. 
+
+### About the Game
 The game progresses in days (levels), each presenting new challenges. 
 The ultimate goal is to live to Day 3; reach (4,4); and win the boss fight.
