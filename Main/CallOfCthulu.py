@@ -2,6 +2,7 @@
 Kim Zhang
 A01374508
 """
+
 import json
 import random
 from pathlib import Path
@@ -176,19 +177,19 @@ def get_user_choice():
     direction_system = {1: "North", 2: "South", 3: "West", 4: "East"}
     red_system = "\033[91m{}\033[0m".format(direction_system)
     print("_" * 10)
-    print(red_system)
+    print("{}".format(red_system))
     while True:
         try:
             choice = int(input("Please choose your direction, please only input numbers from 1 to 4:\n"))
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print("{}".format("Invalid input. Please enter a number."))
         else:
             if choice in [1, 2, 3, 4]:
                 print("You choose to move: {}".format(direction_system[choice]))
                 print("_" * 10)
                 return choice
             else:
-                print("Input must be a number from 1 to 4. Try again.")
+                print("{}".format("Input must be a number from 1 to 4. Try again."))
 
 
 def validate_move(character, direction):
@@ -271,7 +272,7 @@ def mad_or_prophet(level):
                     "Their gaze is frenzied, and an unsettling chill runs down your spine. "
                     "It's clear that this poor soul has succumbed to madness, their mind fractured by horrors unknown. "
                     "With a sudden, startling energy, they lunge at you, driven by an unfathomable madness.")
-        print(mad_text)
+        print("{}".format(mad_text))
         return "Madness"
     elif meet_mad_or_prophet > 8 - level:
         prophet_text = ("As you navigate the misty streets, you encounter a solitary figure. "
@@ -281,14 +282,14 @@ def mad_or_prophet(level):
                         "'heed my words and be enlightened.' "
                         "The air around them vibrates with a strange energy, "
                         "and you sense that this prophet may unlock secrets that will guide your journey.")
-        print(prophet_text)
+        print("{}".format(prophet_text))
         return "Prophet"
     else:
         nobody_text = ("The streets are eerily empty. "
                        "Fog swirls around, casting shifting shadows, yet reveals no other soul. "
                        "An unsettling quiet pervades, as if the town itself holds its breath, "
                        "concealing secrets best left undiscovered.")
-        print(nobody_text)
+        print("{}".format(nobody_text))
         return "Nobody"
 
 
@@ -325,10 +326,10 @@ def check_win(character):
     chance_win = character['Darkness']
     chance = random.randint(1, chance_win)
     if chance >= 3:
-        print("You won")
+        print("{}".format("You won"))
         character["Experience"] += 2
     else:
-        print("You lose")
+        print("{}".format("You lose"))
     character["Current HP"] -= 2
     character["Sanity"] -= 1
     return
@@ -352,16 +353,16 @@ def check_learn(character, level):
         text_learn_runes = ("The prophet, though tainted by otherworldly forces, "
                             "imparts cryptic wisdom that resonates within you, "
                             "enhancing your understanding and strengthening your resolve.")
-        print(text_learn_runes)
-        print("runes learnt")
+        print("{}".format(text_learn_runes))
+        print("{}".format("runes learnt"))
         character["Experience"] += 2
         character["Sanity"] += 1
     else:
-        print("runes not learnt")
+        print("{}".format("runes not learnt"))
         text_not_learnt = ("As you approach, the prophet's form distorts unnaturally, "
                            "their words dissolving into an incomprehensible babble, "
                            "leaving you bewildered and no wiser than before.")
-        print(text_not_learnt)
+        print("{}".format(text_not_learnt))
     return
 
 
@@ -376,7 +377,7 @@ def decide_text():
                  5: "I am unsure what is real anymore, or if my mind has been corrupted by the darkness.",
                  6: "Other worlds are calling me, I hear the summons from unknown realms.",
                  3: "Akhamna, Igwatius... these runes echo in my mind, I cannot stop them"}
-    print(text_base[text_generator])
+    print("{}".format(text_base[text_generator]))
     return
 
 
@@ -390,12 +391,12 @@ def is_alive_and_sane(character):
     :return: True if the character is both alive and sane, False otherwise.
     """
     if character["Current HP"] <= 0:
-        print("You are dead of low HP")
+        print("{}".format("You are dead of low HP"))
         return False
     elif character["Sanity"] <= 0:
-        print("You are mad")
-        print("IT IS CALLING MY NAME, the ancient one from the abyss, I cannot resist his voice.")
-        print("All hail Cthulhu"*5)
+        print("{}".format("You are mad"))
+        print("{}".format("IT IS CALLING MY NAME, the ancient one from the abyss, I cannot resist his voice."))
+        print("{}".format("All hail Cthulhu"*5))
         return False
     else:
         return True
@@ -410,8 +411,9 @@ def boss_fight(character):
     :postcondition: tells if player wins the fight
     :return: True if the player wins the fight, False if lose the fight
     """
-    print("The sea roars, and from its depths emerges the 'Lord of the Abyss', a creature of unspeakable horror.")
-    print("Your HP, Sanity and Darkness ability have restored")
+    print("{}".format("The sea roars, and from its depths emerges the 'Lord of the Abyss', a creature of unspeakable "
+                      "horror."))
+    print("{}".format("Your HP, Sanity and Darkness ability have restored"))
     character["Current HP"] = 13
     character["Sanity"] = 13
     character["Darkness"] = 7
@@ -422,7 +424,7 @@ def boss_fight(character):
         "ag": "Abyssal Gaze - Stares into the abyss, seizing an attack opportunity."
     }
     commands = ["ac", "eb", "ms", "ag"]
-    for command in commands:
+    for index, command in enumerate(commands):
         print(f"{command} : {commands_descriptions[command]}")
     success_count = 0
     for count in range(3):
@@ -431,17 +433,17 @@ def boss_fight(character):
             command = input(f"Invalid command! Enter command {commands} to challenge the abyss: ")
         success_chance = character['Level'] + character['Darkness'] + character['Experience']
         if random.randint(1, 25) <= success_chance:
-            print("Your courage shines, striking a blow against the abyssal horror!")
+            print("{}".format("Your courage shines, striking a blow against the abyssal horror!"))
             success_count += 1
         else:
-            print("Your attack falters. The 'Lord of the Abyss' retaliates with a wave of dark energy!")
+            print("{}".format("Your attack falters. The 'Lord of the Abyss' retaliates with a wave of dark energy!"))
             character["Current HP"] -= 2
             character["Sanity"] -= 1
         if character["Current HP"] <= 0:
-            print("Engulfed by darkness, your journey ends in the jaws of the abyss.")
+            print("{}".format("Engulfed by darkness, your journey ends in the jaws of the abyss."))
             return False
         if character["Sanity"] <= 0:
-            print("Overwhelmed by the abyss, your mind succumbs to madness.")
+            print("{}".format("Overwhelmed by the abyss, your mind succumbs to madness."))
             return False
     return success_count >= 2
 
@@ -514,7 +516,7 @@ def game(username, game_data):
             character = make_character()
             user_data = {'character': character, 'level': 1}
     else:
-        print("New user detected. Creating a new account...")
+        print("{}".format("New user detected. Creating a new account..."))
         character = make_character()
         user_data = {'character': character, 'level': 1}
         game_data[username] = user_data
@@ -543,7 +545,7 @@ def game(username, game_data):
                 if_level_up[0] = check_level_up(character)
                 valid_move = validate_move(character, direction)
                 while valid_move is False:
-                    print("You can't go in that direction. Try another direction.")
+                    print("{}".format("You can't go in that direction. Try another direction."))
                     direction = get_user_choice()
                     valid_move = validate_move(character, direction)
                 move_character(character, direction)
@@ -562,16 +564,17 @@ def game(username, game_data):
             if achieved_goal:
                 if character['Level'] == 3:
                     if boss_fight(character):
-                        print("With a final, valiant effort, you vanquish the 'Lord of the Abyss'. You survived.")
+                        print("{}".format("With a final, valiant effort, you vanquish the 'Lord of the Abyss'. You "
+                                          "survived."))
                     else:
-                        print("Overwhelmed by the ancient terror, your fate is sealed.")
-                    print("Game Over")
+                        print("{}".format("Overwhelmed by the ancient terror, your fate is sealed."))
+                    print("{}".format("Game Over"))
                     print("=" * 20)
                     return
                 else:
                     if_level_up[0] = True
             if not is_alive_and_sane(character):
-                print('Game Over')
+                print("{}".format('Game Over'))
                 print("=" * 20)
                 return
         if if_level_up[0] is True:
